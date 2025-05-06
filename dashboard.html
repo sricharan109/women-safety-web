@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Dashboard | WomenSafety</title>
+  <link rel="stylesheet" href="stylee.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+</head>
+<body>
+  <header class="site-header">
+    <h1 class="brand-name"></h1>
+  </header>
+
+  <div class="login-container">
+    <h2>Welcome to Your Dashboard</h2>
+    <p>Your location is being tracked for safety.</p>
+    <div id="map"></div>
+
+    <div class="button-container">
+      <a href="tel:9492046357">
+        <button>📞 Call Police/Volunteer</button>
+      </a>
+
+      <button onclick="triggerSOS()">🚨 Send SOS Alert</button>
+    </div>
+
+    <p id="sosStatus"></p>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script>
+    let map, marker;
+
+    function initMap(lat, lon) {
+      map = L.map('map').setView([lat, lon], 15);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+      marker = L.marker([lat, lon]).addTo(map).bindPopup('You are here!').openPopup();
+    }
+
+    function updateLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(position => {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+
+          if (!map) {
+            initMap(lat, lon);
+          } else {
+            marker.setLatLng([lat, lon]);
+            map.setView([lat, lon]);
+          }
+        }, () => alert("Location access denied."));
+      } else {
+        alert("Geolocation not supported.");
+      }
+    }
+
+    function triggerSOS() {
+      const sosStatus = document.getElementById('sosStatus');
+      sosStatus.textContent = "🚨 SOS Alert Sending...";
+      sosStatus.style.color = "#ff69b4";
+
+      const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {
+        name: "Unknown",
+        contact: "9492046357", // Your number
+        location: "Unknown"
+      };
+
+      const lat = marker.getLatLng().lat;
+      const lon = marker.getLatLng().lng;
+
+      fetch('http://localhost:3000/send-sos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: userInfo.name,
+          contact: userInfo.contact,
+          location: userInfo.location,
+          lat,
+          lon
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          sosStatus.textContent = "✅ SOS Sent via WhatsApp!";
+        } else {
+          sosStatus.textContent = "❌ Failed to send SOS.";
+        }
+      })
+      .catch(() => {
+        sosStatus.textContent = "❌ Error contacting server.";
+      });
+
+      const alert = {
+        time: new Date().toLocaleTimeString(),
+        lat,
+        lon,
+        user: userInfo
+      };
+
+      let alerts = JSON.parse(localStorage.getItem("sosAlerts")) || [];
+      alerts.push(alert);
+      localStorage.setItem("sosAlerts", JSON.stringify(alerts));
+    }
+
+    updateLocation();
+  </script>
+</body>
+</html>

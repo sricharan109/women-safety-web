@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Signup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="min-h-screen flex items-center justify-center bg-gradient-to-r from-cyan-400 via-blue-500 to-pink-500">
+  <div class="bg-white p-10 rounded-xl shadow-lg w-full max-w-md">
+    <h2 class="text-3xl font-bold text-center mb-6">User Signup</h2>
+
+    <form onsubmit="signup(event)" class="space-y-5">
+      <div>
+        <label class="block text-sm font-medium mb-1">Full Name</label>
+        <div class="flex items-center border-b border-gray-300 py-2">
+          <span class="material-icons mr-2 text-gray-500">person</span>
+          <input type="text" id="name" placeholder="Enter your full name" class="w-full outline-none" required />
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Email</label>
+        <div class="flex items-center border-b border-gray-300 py-2">
+          <span class="material-icons mr-2 text-gray-500">email</span>
+          <input type="email" id="email" placeholder="Enter your email" class="w-full outline-none" required />
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Password</label>
+        <div class="flex items-center border-b border-gray-300 py-2">
+          <span class="material-icons mr-2 text-gray-500">lock</span>
+          <input type="password" id="password" placeholder="Create a password" class="w-full outline-none" required />
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Address</label>
+        <div class="flex items-center border-b border-gray-300 py-2">
+          <span class="material-icons mr-2 text-gray-500">home</span>
+          <input type="text" id="address" placeholder="Enter your address" class="w-full outline-none" required />
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium mb-1">Phone Number</label>
+        <div class="flex items-center border-b border-gray-300 py-2">
+          <span class="material-icons mr-2 text-gray-500">phone</span>
+          <input type="tel" id="phone-number" placeholder="Enter your phone number" class="w-full outline-none" required />
+        </div>
+      </div>
+
+      <div id="message" class="text-center text-sm mt-2"></div>
+
+      <button type="submit" class="w-full py-2 rounded-full bg-gradient-to-r from-cyan-400 to-pink-500 text-white font-bold hover:opacity-90">
+        SIGN UP
+      </button>
+    </form>
+
+    <div class="text-center my-4 text-gray-500">Or Sign Up Using</div>
+
+    <div class="flex justify-center space-x-4 mb-6">
+      <a href="#" class="text-blue-700 text-2xl"><i class="fab fa-facebook"></i></a>
+      <a href="#" class="text-blue-400 text-2xl"><i class="fab fa-twitter"></i></a>
+      <a href="#" class="text-red-500 text-2xl"><i class="fab fa-google"></i></a>
+    </div>
+
+    <div class="text-center text-sm text-gray-500">
+      Already have an account? <a href="login.html" class="text-blue-500 font-medium">LOGIN</a>
+    </div>
+  </div>
+
+  <!-- Script to send data to Express server -->
+  <script>
+    async function signup(event) {
+      event.preventDefault();
+      const messageEl = document.getElementById('message');
+
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const address = document.getElementById("address").value;
+      const phoneNumber = document.getElementById("phone-number").value;
+
+      try {
+        const res = await fetch('http://localhost:3000/api/user/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password, address, phoneNumber })
+        });
+
+        const data = await res.json();
+        messageEl.textContent = data.message;
+        messageEl.className = res.ok ? 'text-green-600' : 'text-red-600';
+      } catch (err) {
+        messageEl.textContent = 'Error connecting to server.';
+        messageEl.className = 'text-red-600';
+        console.error(err);
+      }
+    }
+  </script>
+</body>
+</html>
