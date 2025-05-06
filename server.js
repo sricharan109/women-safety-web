@@ -14,12 +14,12 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static('public')); // Serve frontend files
 
-// MongoDB connection
-mongoose.connect('mongodb://localhost:27017/womenSafetyApp', {
+// MongoDB connection using environment variable
+mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-}).then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB error:', err));
+}).then(() => console.log('✅ Connected to MongoDB Atlas'))
+  .catch(err => console.error('❌ MongoDB error:', err));
 
 // Twilio Setup
 const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
