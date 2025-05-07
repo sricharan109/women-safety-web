@@ -86,7 +86,7 @@
       const phoneNumber = document.getElementById("phone-number").value;
 
       try {
-        const res = await fetch('http://localhost:3000/api/user/signup', {
+        const res = await fetch('https://women-safety-web-1.onrender.com/api/user/signup', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name, email, password, address, phoneNumber })

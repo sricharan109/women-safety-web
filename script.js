@@ -1,12 +1,15 @@
-// Login logic
+// ------------------ LOGIN LOGIC ------------------
+
 async function login(event, type) {
   event.preventDefault();
 
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value.trim();
   const message = document.getElementById('message');
 
-  const endpoint = type === 'volunteer' ? 'http://localhost:3000/api/volunteer/login' : 'http://localhost:3000/api/user/login';
+  const endpoint = type === 'volunteer'
+    ? 'https://women-safety-web-1.onrender.com/api/volunteer/login'
+    : 'https://women-safety-web-1.onrender.com/api/user/login';
 
   try {
     const res = await fetch(endpoint, {
@@ -20,28 +23,25 @@ async function login(event, type) {
     if (res.ok) {
       message.textContent = "Login successful!";
       message.className = "text-green-500 text-center mt-2";
+
       setTimeout(() => {
-        window.location.href = "dashboard.html"; // or another page
+        window.location.href = "dashboard.html"; // Redirect after success
       }, 1000);
     } else {
       message.textContent = data.message || "Login failed.";
       message.className = "text-red-500 text-center mt-2";
     }
   } catch (error) {
+    console.error(error);
     message.textContent = "Error logging in.";
     message.className = "text-red-500 text-center mt-2";
-    console.error(error);
   }
 }
 
 
-// Animation logic
 class Experience {
   constructor(container, width, height) {
-    console.clear();
-    this.raycaster = new THREE.Raycaster();
-    this.mouse = new THREE.Vector2(0, 0);
-
+    this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(70, width / height, 1, 3000);
     this.camera.position.z = 200;
 
@@ -51,22 +51,26 @@ class Experience {
     this.renderer.setPixelRatio(window.devicePixelRatio);
     container.appendChild(this.renderer.domElement);
 
+    this.mouse = new THREE.Vector2();
+    this.raycaster = new THREE.Raycaster();
+
+    this._addLights();
+    this._addMeshes();
+
     this.fpsInterval = 1000 / 60;
     this.then = Date.now();
 
-    this.scene = new THREE.Scene();
-    this._addLights();
-    this._addMeshes();
     this.resize();
-    this.bind();
+    this.bindEvents();
     this.loop();
   }
 
   _addLights() {
-    this.scene.add(new THREE.AmbientLight(0x0));
-    const spotLight = new THREE.SpotLight(0xf2056f, 0.68, 0);
+    this.scene.add(new THREE.AmbientLight(0x000000));
+    const spotLight = new THREE.SpotLight(0xf2056f, 0.68);
     spotLight.position.set(150, 150, 0);
     this.scene.add(spotLight);
+
     const hemiLight = new THREE.HemisphereLight(0xd8c7f3, 0x61dafb, 1);
     this.scene.add(hemiLight);
   }
@@ -126,9 +130,9 @@ class Experience {
     gsap.to(this._cone.scale, { duration: 0.6, x: 0.8 });
   }
 
-  bind() {
-    window.addEventListener('resize', this.resize.bind(this), false);
-    document.body.addEventListener("mousemove", this.onMouseMove.bind(this), false);
+  bindEvents() {
+    window.addEventListener('resize', () => this.resize());
+    document.body.addEventListener("mousemove", this.onMouseMove.bind(this));
 
     const hoverArea = document.querySelector("a");
     if (hoverArea) {
@@ -148,10 +152,9 @@ class Experience {
     const delta = now - this.then;
 
     if (delta > this.fpsInterval) {
-      this.camera.position.x += this.mouse.x * (window.innerWidth * 0.02) - this.camera.position.x * 0.03;
-      this.camera.position.y += -this.mouse.y * (window.innerHeight * 0.02) - this.camera.position.y * 0.03;
+      this.camera.position.x += (this.mouse.x * (window.innerWidth * 0.02) - this.camera.position.x) * 0.03;
+      this.camera.position.y += (-this.mouse.y * (window.innerHeight * 0.02) - this.camera.position.y) * 0.03;
       this.camera.lookAt(this.scene.position);
-
       this.renderer.render(this.scene, this.camera);
       this.then = now;
     }
@@ -166,7 +169,7 @@ class Experience {
   }
 }
 
-// Start animation
+
 const container = document.querySelector('.home');
 if (container) {
   new Experience(container, window.innerWidth, window.innerHeight);

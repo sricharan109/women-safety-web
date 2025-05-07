@@ -51,9 +51,9 @@
   <script>
     async function loadStats() {
   try {
-    const userRes = await fetch('http://localhost:3000/api/stats/users/count');
-    const volunteerRes = await fetch('http://localhost:3000/api/stats/volunteers/count');
-    const alertsRes = await fetch('http://localhost:3000/api/alerts/recent');
+    const userRes = await fetch('https://women-safety-web-1.onrender.com/api/stats/users/count');
+    const volunteerRes = await fetch('https://women-safety-web-1.onrender.com/api/stats/volunteers/count');
+    const alertsRes = await fetch('https://women-safety-web-1.onrender.com/api/alerts/recent');
 
     const users = await userRes.json();
     const volunteers = await volunteerRes.json();

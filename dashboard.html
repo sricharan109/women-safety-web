@@ -70,7 +70,7 @@
       const lat = marker.getLatLng().lat;
       const lon = marker.getLatLng().lng;
 
-      fetch('http://localhost:3000/send-sos', {
+      fetch('https://women-safety-web-1.onrender.com/send-sos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
